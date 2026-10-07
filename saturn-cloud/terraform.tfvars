@@ -48,4 +48,4 @@ saturn_bootstrap_token = ""
 
 # enable_filestore              = true   # Set to false to skip creating a shared filesystem
 # existing_filestore            = ""     # Use an existing filestore ID, or leave empty to create a new one
-# filestore_disk_size_gibibytes = 100    # Size of the shared filesystem in GiB (fixed, does not auto-expand)
+# filestore_disk_size_gibibytes = 2048   # Size of the shared filesystem in GiB (does not auto-expand; grow with `nebius compute filesystem update --size-gibibytes`)

@@ -115,9 +115,9 @@ variable "filestore_disk_type" {
 }
 
 variable "filestore_disk_size_gibibytes" {
-  description = "Filestore disk size in GiB."
+  description = "Filestore disk size in GiB. Every csi-mounted-fs-path-sc claim (shared folders, Dynamo Snapshot artifacts, the Token Factory model cache) is carved from this one filesystem, so claim sizes do not add up; one 32B model's weights alone are about 61 GiB."
   type        = number
-  default     = 100
+  default     = 2048
 }
 
 variable "filestore_block_size_kibibytes" {
