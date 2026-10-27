@@ -86,6 +86,12 @@ variable "helm_chart_version" {
   default = "2026.02.01-123"
 }
 
+variable "enable_image_builds" {
+  description = "Create a Nebius Container Registry and a push key for Saturn image builds (see README, Image builds). Needs kubectl on PATH where terraform runs."
+  type        = bool
+  default     = true
+}
+
 variable "k8s_version" {
   description = "Kubernetes version for the cluster"
   type        = string
