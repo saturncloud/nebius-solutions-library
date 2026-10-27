@@ -8,6 +8,7 @@ This Terraform configuration creates a Nebius Managed Kubernetes cluster configu
 2. Terraform installed (>= 1.0)
 3. [Nebius CLI](https://docs.nebius.com/cli/install) installed and configured
 4. `jq` installed
+5. `kubectl` installed (used to store the image-build registry key in the cluster; set `enable_image_builds = false` to skip)
 
 ## Setup Instructions
 
@@ -98,3 +99,41 @@ terraform apply
 ```
 
 Deployment typically takes 15-30 minutes.
+
+## Image builds
+
+Saturn builds the images users define in the Images page and pushes them to a
+Nebius Container Registry in your project. With `enable_image_builds = true`
+(the default) Terraform creates:
+
+- a registry `<cluster_name>-images` (output `saturn_image_registry`);
+- a service account `<cluster_name>-ncr-push` in a group of the same name,
+  whose only permission is `editor` on that one registry;
+- a static key for that service account, written by
+  `scripts/ncr-push-key.sh` into the cluster Secret
+  `saturn/saturn-container-registry`. Atlas reads the Secret. The key is not
+  stored in Terraform state or in helm values, and is never printed.
+
+Nodes pull the built images with the node service account (`<cluster_name>-ncr-nodes`).
+
+The key script runs on every `terraform apply` and only issues a new key when
+the Secret is missing or the current key is gone or within 30 days of expiry,
+so `terraform plan` always shows `terraform_data.ncr_push_key` being replaced.
+That is expected.
+
+### Key rotation
+
+Keys are issued with a 6-month lifetime. Any `terraform apply` in the last 30
+days before expiry rotates the key automatically: a new key is written to the
+Secret, Atlas restarts to read it, and the old key is deleted. Run
+`terraform apply` at least once every 5 months.
+
+To rotate now (for example, if the key may have been exposed):
+
+```bash
+FORCE_ROTATE=1 terraform apply
+```
+
+`FORCE_ROTATE` is passed to the script through the environment. Every older
+key of the push service account is deleted after the new one is in place.
+
