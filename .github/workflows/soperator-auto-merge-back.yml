@@ -5,6 +5,9 @@ on:
     branches:
       - 'soperator-release-*'
 
+permissions:
+  contents: read
+
 jobs:
   create-merge-back-pr:
     name: Create merge back PR

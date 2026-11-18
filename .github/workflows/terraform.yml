@@ -12,7 +12,7 @@ on:
 #    - cron: '30 * * * *'
 
 permissions:
-  contents: write
+  contents: read
 
 env:
   TF_VAR_parent_id: project-e00pjzzrtk1fs3yavy
@@ -25,11 +25,11 @@ jobs:
       solutions: ${{ steps.parse-changed-files.outputs.solutions }}
     steps:
       - name: Check out code
-        uses: actions/checkout@v4
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
 
       - name: List changed files
         id: changed-files
-        uses: tj-actions/changed-files@v46.0.5
+        uses: tj-actions/changed-files@ed68ef82c095e0d48ec87eccea555d944a631a4c # v46.0.5
         with:
           files_ignore: |
             .github/**
@@ -63,10 +63,10 @@ jobs:
 
     steps:
     - name: Checkout
-      uses: actions/checkout@v4
+      uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
 
     - name: Setup Terraform
-      uses: hashicorp/setup-terraform@v3
+      uses: hashicorp/setup-terraform@b9cd54a3c349d3f38e8881555d616ced269862dd # v3.1.2
       with:
         terraform_version: "v1.11.4"
 
@@ -89,6 +89,8 @@ jobs:
         echo The username is ${{ inputs.username }} created PR ${{ github.event.number }} which triggers the pipeline, and requries approval
 
   terraform:
+    permissions:
+      contents: write
     needs: [approve_terraform, detect-changes]
     name: 'Terraform ${{ matrix.solution }}'
     environment:
@@ -114,7 +116,7 @@ jobs:
     steps:
     # Checkout the repository to the GitHub Actions runner
     - name: Checkout
-      uses: actions/checkout@v4
+      uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
 
     - name: Setup SSH keys and agent
       run: |
@@ -162,7 +164,7 @@ jobs:
 
     # Install the latest version of Terraform CLI and configure the Terraform CLI configuration file with a Terraform Cloud user API token
     - name: Setup Terraform
-      uses: hashicorp/setup-terraform@v3
+      uses: hashicorp/setup-terraform@b9cd54a3c349d3f38e8881555d616ced269862dd # v3.1.2
       with:
         terraform_version: "v1.11.4"
 
@@ -196,7 +198,7 @@ jobs:
       if: always()
 
     - name: Load test report history
-      uses: actions/checkout@v4
+      uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
       if: always()
       continue-on-error: true
       with:
@@ -204,7 +206,7 @@ jobs:
         path: gh-pages
 
     - name: Build test report
-      uses: simple-elf/allure-report-action@v1.13
+      uses: simple-elf/allure-report-action@53ebb757a2097edc77c53ecef4d454fc2f2f774c # v1.13
       if: always()
       with:
         gh_pages: gh-pages
@@ -213,7 +215,7 @@ jobs:
         allure_results: ${{ matrix.solution }}/tests/reports
 
     - name: Publish test report
-      uses: peaceiris/actions-gh-pages@v4
+      uses: peaceiris/actions-gh-pages@84c30a85c19949d7eee79c4ff27748b70285e453 # v4.1.0
       if: always()
       with:
         github_token: ${{ secrets.GITHUB_TOKEN }}
